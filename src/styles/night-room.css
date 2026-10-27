@@ -1,0 +1,469 @@
+/* ==========================================================================
+   NIGHT ROOM EXPERIENCE (THE NOCTURNAL IZAKAYA)
+   ========================================================================== */
+
+#night-experience {
+  position: relative;
+  z-index: 20;
+  display: none;
+  background-color: var(--color-night-bg);
+  color: var(--color-night-text);
+  opacity: 0;
+  transition: opacity 1s var(--ease-cinematic);
+}
+
+#night-experience.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Section Header (Bürocratik Minimalist Style) */
+.section-header {
+  padding: var(--space-2xl) 0 var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--neon-amber);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--neon-amber);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4.5vw, 64px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.section-title span.accent {
+  color: var(--neon-amber);
+}
+
+/* ==========================================================================
+   INTERIOR AMBIANCE INTRO: NEON WALL & CANOPY
+   ========================================================================== */
+.night-intro-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  padding: var(--space-xl) 0;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .night-intro-grid {
+    grid-template-columns: 1fr 1.2fr;
+  }
+}
+
+.night-intro-visual {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+.night-intro-visual img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 0.8s var(--ease-cinematic);
+}
+
+.night-intro-visual:hover img {
+  transform: scale(1.03);
+}
+
+/* Neon Signs Representation (ТАЙСЁ ЛЮБОЙ НАВСЕГДА) */
+.neon-signs-wall {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-lg);
+  background: rgba(18, 20, 25, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.vertical-neon {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2.2vw, 26px);
+  font-weight: 900;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.18em;
+  color: var(--neon-amber);
+  text-shadow: 
+    0 0 5px var(--neon-amber),
+    0 0 15px var(--neon-amber-glow),
+    0 0 30px var(--neon-amber-glow);
+  padding: 16px 8px;
+  border: 1px solid rgba(255, 208, 0, 0.3);
+  background: rgba(255, 208, 0, 0.03);
+  border-radius: 4px;
+}
+
+.round-mirror {
+  width: clamp(70px, 9vw, 110px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.8));
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.round-mirror img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.65;
+  filter: contrast(1.2);
+}
+
+/* ==========================================================================
+   3D MENU MOCKUP SHOWCASE (AMPLE SPACE & BESPOKE ART OBJECTS)
+   ========================================================================== */
+.mockups-showcase-section {
+  padding: var(--space-3xl) 0;
+  position: relative;
+}
+
+.mockups-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+  margin-top: var(--space-xl);
+}
+
+.mockup-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  align-items: center;
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (min-width: 992px) {
+  .mockup-card {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: var(--space-3xl);
+  }
+
+  .mockup-card:nth-child(even) {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+
+  .mockup-card:nth-child(even) .mockup-visual-wrap {
+    order: 2;
+  }
+}
+
+/* 3D Visual Stage with Negative Space & Ambient Rim Glow */
+.mockup-visual-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+/* Ambient Backlight Glow behind the stone */
+.mockup-ambient-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(60px);
+  opacity: 0.45;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.glow-amber {
+  background: radial-gradient(circle, var(--neon-amber) 0%, transparent 70%);
+}
+
+.glow-purple {
+  background: radial-gradient(circle, var(--neon-purple) 0%, transparent 70%);
+}
+
+.glow-cyan {
+  background: radial-gradient(circle, var(--neon-cyan) 0%, var(--neon-amber) 40%, transparent 75%);
+}
+
+.mockup-stage {
+  position: relative;
+  z-index: 2;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.85),
+    0 0 1px 1px rgba(255, 255, 255, 0.08);
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease-out;
+  cursor: grab;
+}
+
+.mockup-stage img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transform: scale(1.01);
+}
+
+/* Info Column */
+.mockup-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 480px;
+}
+
+.mockup-index {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--neon-amber);
+}
+
+.mockup-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.mockup-composition-note {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-night-muted);
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  padding-left: 12px;
+}
+
+.mockup-desc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #b0b2ba;
+}
+
+.mockup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mockup-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  color: #d1d3db;
+}
+
+/* ==========================================================================
+   MENU LIST & SUB ZERO TABS SECTION
+   ========================================================================== */
+.menu-catalog-section {
+  padding: var(--space-2xl) 0 var(--space-3xl);
+  position: relative;
+}
+
+.menu-filter-bar {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-xl) 0 var(--space-2xl);
+}
+
+.menu-items-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  transition: background-color 0.25s ease, padding-left 0.25s ease;
+  cursor: pointer;
+}
+
+.menu-row:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+  padding-left: 14px;
+}
+
+.menu-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: var(--space-md);
+}
+
+.menu-item-name {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-item-name .badge-special {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  background: rgba(255, 208, 0, 0.15);
+  border: 1px solid var(--neon-amber);
+  color: var(--neon-amber);
+  border-radius: 2px;
+}
+
+.menu-item-desc {
+  font-size: 13.5px;
+  color: var(--color-night-muted);
+  max-width: 540px;
+  line-height: 1.5;
+}
+
+.menu-item-price {
+  font-family: var(--font-mono);
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 700;
+  color: var(--neon-amber);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Floating Dish Preview Tooltip on Row Hover */
+.dish-hover-preview {
+  position: fixed;
+  width: 220px;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dish-hover-preview.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.dish-hover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   NEON KOI BAR EXPERIENCE SECTION
+   ========================================================================== */
+.bar-koi-section {
+  padding: var(--space-3xl) 0;
+  background: radial-gradient(circle at 80% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 20% 50%, rgba(255, 208, 0, 0.08) 0%, transparent 60%);
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-koi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .bar-koi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.bar-tile-wall {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+}
+
+.bar-tile-wall img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Animated Neon Koi Overlay */
+.neon-koi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: rgba(12, 14, 18, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
+}
+
+.neon-koi-badge .koi-icon {
+  width: 28px;
+  height: 28px;
+  animation: floatKoi 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatKoi {
+  0% { transform: translateY(-2px) rotate(-3deg); }
+  100% { transform: translateY(2px) rotate(3deg); }
+}

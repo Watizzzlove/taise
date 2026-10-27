@@ -1,0 +1,190 @@
+/* ==========================================================================
+   TATTU CURTAIN REVEAL FOOTER
+   Reveals an atmospheric sticky/fixed underlay as the page finishes scrolling
+   ========================================================================== */
+
+/* Main wrapper that scrolls over the footer */
+#main-scroll-content {
+  position: relative;
+  z-index: 10;
+  background-color: var(--color-night-bg);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+}
+
+/* The Tattu Reveal Footer */
+#tattu-reveal-footer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  min-height: 80vh;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 20%, #1e1910 0%, #0d0e12 60%, #060709 100%);
+  color: var(--color-night-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-3xl) 0 var(--space-xl);
+  overflow: hidden;
+}
+
+/* Subtle background glowing branch watermark in footer */
+.footer-ambient-graphic {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 208, 0, 0.12) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.footer-top-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xl);
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 992px) {
+  .footer-top-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-3xl);
+  }
+}
+
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Big Glowing Neon Signature */
+.footer-neon-signature {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 68px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff8d6;
+  text-shadow: 
+    0 0 10px var(--neon-amber),
+    0 0 25px var(--neon-amber-glow),
+    0 0 60px rgba(255, 208, 0, 0.35);
+  line-height: 1.05;
+}
+
+.footer-brand-desc {
+  font-size: 15px;
+  color: var(--color-night-muted);
+  max-width: 440px;
+  line-height: 1.6;
+}
+
+/* Booking Form */
+.footer-booking-box {
+  background: rgba(22, 25, 32, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--space-xl);
+  border-radius: 6px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.booking-box-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.booking-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-night-muted);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(10, 11, 14, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  color: #ffffff;
+  font-family: var(--font-logo);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: var(--neon-amber);
+  box-shadow: 0 0 12px var(--neon-amber-glow);
+}
+
+.booking-submit-btn {
+  grid-column: span 2;
+  margin-top: 8px;
+}
+
+/* Footer Bottom Bar */
+.footer-bottom-bar {
+  margin-top: var(--space-3xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-night-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom-bar {
+    flex-direction: row;
+  }
+}
+
+.footer-social-links {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.footer-social-links a {
+  transition: color 0.3s ease;
+}
+
+.footer-social-links a:hover {
+  color: var(--neon-amber);
+}

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТАЙСЁ — Азиатское бистро &amp; бар // Суши и коктейли</title>
+  <meta name="description" content="ТАЙСЁ — современное азиатское бистро и бар. Японский ваби-саби, авторские суши, роллы на диком камне, коктейли и ночная неоновая атмосфера.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&family=Unbounded:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/base.css">
+  <link rel="stylesheet" href="/src/styles/hero.css">
+  <link rel="stylesheet" href="/src/styles/subzero-buttons.css">
+  <link rel="stylesheet" href="/src/styles/night-room.css">
+  <link rel="stylesheet" href="/src/styles/tattu-footer.css">
+</head>
+<body>
+
+  <!-- Subtle Film Grain Overlay -->
+  <div class="film-grain" aria-hidden="true"></div>
+
+  <!-- Portal Flash Effect on Entering Night Mode -->
+  <div id="portal-flash" aria-hidden="true"></div>
+
+  <!-- Floating Dish Image Preview Tooltip -->
+  <div id="dish-preview-tooltip" class="dish-hover-preview" aria-hidden="true">
+    <img src="/assets/dishes/XXXL (2).webp" alt="Превью блюда">
+  </div>
+
+  <!-- ========================================================================
+       SITE HEADER
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="header-logo">
+      <a href="#" class="brand-title">
+        Т А <span class="has-macron">И</span> С <span class="has-macron">Е</span>
+      </a>
+      <span class="brand-subtitle">СУШИ &amp; КОКТЕЙЛИ</span>
+    </div>
+
+    <div class="header-meta">
+      <div class="mono-badge">
+        <span class="dot"></span>
+        <span>ОТКРЫТО • ДО 02:00</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a href="#street" id="btn-back-street" class="btn-back-street">
+        ↩ На улицу
+      </a>
+      <button id="nav-book-btn" class="btn-subzero">
+        <span class="btn-text">БРОНЬ СТОЛА</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       HERO SCREEN (DAY / TWILIGHT 3D ARCHITECTURAL DIORAMA)
+       ======================================================================== -->
+  <section id="hero-section">
+    <!-- Left Column: Airy Typography & Content -->
+    <div class="hero-content-col">
+      <div class="hero-meta-top">
+        <span class="mono-badge">[ 55.16° N // ASIAN BISTRO &amp; BAR ]</span>
+      </div>
+
+      <h1 class="hero-main-title">
+        Т А <span class="has-macron">И</span> С <span class="has-macron">Е</span>
+      </h1>
+      <p class="hero-subtitle">СУШИ &amp; КОКТЕЙЛИ</p>
+
+      <p class="hero-desc">
+        Днем — спокойный свет минеральных текстур, дикого сланца и ветвей белой сакуры. С наступлением сумерек Тайсё преображается в ночную изакаю с теплым неоном, шепотом коктейльного льда и чистым вкусом.
+      </p>
+
+      <div class="hero-action-bottom">
+        <button id="btn-enter-trigger" class="btn-enter-taise">
+          <span>Войти в Тайсё</span>
+          <span class="arrow-icon">➔</span>
+        </button>
+        <span class="hero-hint">Нажмите, чтобы перенестись внутрь ресторана</span>
+      </div>
+    </div>
+
+    <!-- Right Column: 3D Building Scene -->
+    <div class="hero-3d-col">
+      <div id="hero-canvas-container"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       NIGHT EXPERIENCE (THE NOCTURNAL IZAKAYA)
+       ======================================================================== -->
+  <div id="night-experience">
+    <!-- Wrapper for Main Scroll Content (Lifts above Tattu Footer) -->
+    <div id="main-scroll-content">
+
+      <!-- ====================================================================
+           SECTION 1: NOCTURNAL LOUNGE INTRO
+           ==================================================================== -->
+      <section id="night-ambiance-start" class="container">
+        <div class="section-header">
+          <span class="section-label">[ 01 // NOCTURNAL LOUNGE ]</span>
+          <h2 class="section-title">
+            ПОЛУТОНА, ШЕПОТ ЛЬДА <br>
+            <span class="accent">&amp; ЧИСТЫЙ ВКУС</span>
+          </h2>
+        </div>
+
+        <div class="night-intro-grid">
+          <!-- Main Evening Hall Photo -->
+          <div class="night-intro-visual">
+            <img src="/assets/interiour/22723391_2000.jpg" alt="Вечерний зал Тайсё с гостями и неоновой волной" loading="lazy">
+          </div>
+
+          <!-- Iconic Neon Wall Composition -->
+          <div class="neon-signs-wall">
+            <div class="vertical-neon">ТАЙСЁ</div>
+            <div class="round-mirror">
+              <img src="/assets/interiour/XXXL (23).webp" alt="Отражение сакуры">
+            </div>
+            <div class="vertical-neon">ЛЮБОЙ</div>
+            <div class="round-mirror">
+              <img src="/assets/interiour/XXXL (26).webp" alt="Отражение киберпанк арта">
+            </div>
+            <div class="vertical-neon">НАВСЕГДА</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 2: 3D BESPOKE MOCKUPS SHOWCASE (AMPLE SPACE)
+           ==================================================================== -->
+      <section class="mockups-showcase-section container">
+        <div class="section-header">
+          <span class="section-label">[ 02 // BESPOKE 3D PRESENTATION ]</span>
+          <h2 class="section-title">
+            ИСКУССТВО ПОДАЧИ НА <br>
+            <span class="accent">ДИКОМ КАМНЕ И ВЕТВЯХ</span>
+          </h2>
+          <p class="hero-desc" style="margin-bottom: 0;">
+            Каждое блюдо в Тайсё создается как арт-объект: грубая фактура сланца, обожженное дерево якисуги и природная геометрия ветвей подчеркивают безупречную свежесть ингредиентов.
+          </p>
+        </div>
+
+        <div class="mockups-grid">
+          <!-- 3D Mockup 1: Rolls on Stone with Branch -->
+          <article class="mockup-card">
+            <div class="mockup-visual-wrap">
+              <div class="mockup-ambient-glow glow-amber" aria-hidden="true"></div>
+              <div class="mockup-stage">
+                <img src="/assets/mockups/rolls_stone.jpg" alt="3D мокап: авторские роллы на камне с обвивающей веткой сакуры">
+              </div>
+            </div>
+            <div class="mockup-info">
+              <span class="mockup-index">[ 01. RAW &amp; ROLL BAR ]</span>
+              <h3 class="mockup-title">ТАЙСЁ СПЕШЛ РОЛЛ</h3>
+              <p class="mockup-composition-note">Подача: обожженный якисуги на сером диком сланце с цветущей веткой</p>
+              <p class="mockup-desc">
+                Опаленный филе-лосось, мясо камчатского краба, рубиновая икра тобико и свежий огурец под авторским трюфельно-унаги соусом.
+              </p>
+              <div class="mockup-tags">
+                <span class="mockup-tag">Wild Salmon</span>
+                <span class="mockup-tag">Red Tobiko</span>
+                <span class="mockup-tag">Truffle Tare</span>
+                <span class="mockup-tag">890 ₽</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- 3D Mockup 2: Poke & Robata in Ceramic -->
+          <article class="mockup-card">
+            <div class="mockup-visual-wrap">
+              <div class="mockup-ambient-glow glow-purple" aria-hidden="true"></div>
+              <div class="mockup-stage">
+                <img src="/assets/mockups/poke_stone.jpg" alt="3D мокап: поке с лососем в крафтовой керамике на речном камне">
+              </div>
+            </div>
+            <div class="mockup-info">
+              <span class="mockup-index">[ 02. BOWLS &amp; ROBATA ]</span>
+              <h3 class="mockup-title">ЛОСОСЬ &amp; АВОКАДО ПОКЕ</h3>
+              <p class="mockup-composition-note">Подача: керамика ручной лепки с крафтовыми сотами на речном валуне</p>
+              <p class="mockup-desc">
+                Крупные кубики охлажденного лосося, нежный веер из спелого авокадо, бобы эдамаме, хрустящий кунжут и заправка понзу-юдзу.
+              </p>
+              <div class="mockup-tags">
+                <span class="mockup-tag">Handmade Ceramic</span>
+                <span class="mockup-tag">Yuzu Ponzu</span>
+                <span class="mockup-tag">Fresh Avocado</span>
+                <span class="mockup-tag">760 ₽</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- 3D Mockup 3: Craft Bar Cocktail with Koi Reflection -->
+          <article class="mockup-card">
+            <div class="mockup-visual-wrap">
+              <div class="mockup-ambient-glow glow-cyan" aria-hidden="true"></div>
+              <div class="mockup-stage">
+                <img src="/assets/mockups/bar_cocktail.jpg" alt="3D мокап: авторский коктейль в граненом бокале на граните с неоновыми карпами">
+              </div>
+            </div>
+            <div class="mockup-info">
+              <span class="mockup-index">[ 03. CRAFT IZAKAYA BAR ]</span>
+              <h3 class="mockup-title">КОКТЕЙЛЬ «TOKYO DRIFT»</h3>
+              <p class="mockup-composition-note">Подача: граненый хрустальный рокс, прозрачный монолитный куб льда с гравировкой</p>
+              <p class="mockup-desc">
+                Японский виски, дистиллят юдзу, сливовое вино Umeshu, лемонграсс и биттер из дикой вишни. Подается на темном мокром граните.
+              </p>
+              <div class="mockup-tags">
+                <span class="mockup-tag">Japanese Whisky</span>
+                <span class="mockup-tag">Umeshu</span>
+                <span class="mockup-tag">Clear Monolith Ice</span>
+                <span class="mockup-tag">650 ₽</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 3: CHEF'S MENU WITH SUB ZERO DISTRESSED TABS
+           ==================================================================== -->
+      <section class="menu-catalog-section container">
+        <div class="section-header" style="align-items: center; text-align: center;">
+          <span class="section-label">[ 03 // CHEF'S SELECTION ]</span>
+          <h2 class="section-title">МЕНЮ БИСТРО &amp; БАРА</h2>
+        </div>
+
+        <!-- Sub Zero Multi-Segment Tab Filter [ ЕДА | АЛКО | СПЕШЛЫ ] -->
+        <div class="menu-filter-bar">
+          <div class="subzero-tab-group">
+            <button class="subzero-tab active" data-filter="all">
+              <span class="tab-title">ВСЁ</span>
+            </button>
+            <button class="subzero-tab" data-filter="food">
+              <span class="tab-title">ЕДА</span>
+            </button>
+            <button class="subzero-tab" data-filter="bar">
+              <span class="tab-title">АЛКО</span>
+            </button>
+            <button class="subzero-tab" data-filter="specials">
+              <span class="tab-title">СПЕШЛЫ</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Dishes Table with Live Hover Tooltips -->
+        <div class="menu-items-table">
+          <div class="menu-row" data-category="food" data-image="/assets/mockups/rolls_stone.jpg">
+            <div class="menu-row-main">
+              <span class="menu-item-name">
+                Тайсё Спешл Ролл с опаленным лососем
+                <span class="badge-special">TOP</span>
+              </span>
+              <span class="menu-item-desc">Камчатский краб, красная икра тобико, хрустящий огурец, трюфельный соус унаги</span>
+            </div>
+            <span class="menu-item-price">890 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="food" data-image="/assets/dishes/XXXL (15).webp">
+            <div class="menu-row-main">
+              <span class="menu-item-name">
+                Креветки в темпуре с васаби-майо
+                <span class="badge-special">NEW</span>
+              </span>
+              <span class="menu-item-desc">Тигровые креветки в легком кляре темпура, лепестки авокадо, соус из сладкого васаби</span>
+            </div>
+            <span class="menu-item-price">690 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="specials" data-image="/assets/dishes/XXXL (4).webp">
+            <div class="menu-row-main">
+              <span class="menu-item-name">
+                Лосось Терияки на диком сланце
+                <span class="badge-special">CHEF</span>
+              </span>
+              <span class="menu-item-desc">Стейк лосося су-вид в глазури мисо-терияки, киноа с зеленым луком и микрозеленью</span>
+            </div>
+            <span class="menu-item-price">940 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="food" data-image="/assets/dishes/XXXL (2).webp">
+            <div class="menu-row-main">
+              <span class="menu-item-name">Томленые свиные ребра в соусе барбекю-понзу</span>
+              <span class="menu-item-desc">Глазурь из соевого соуса и имбиря, хрустящий лук шалот, маринованная капуста кимчи</span>
+            </div>
+            <span class="menu-item-price">850 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="bar" data-image="/assets/mockups/bar_cocktail.jpg">
+            <div class="menu-row-main">
+              <span class="menu-item-name">
+                Коктейль «Tokyo Drift»
+                <span class="badge-special">SIGNATURE</span>
+              </span>
+              <span class="menu-item-desc">Японский купажированный виски, кордиал из юдзу, сливовый ликёр Umeshu, прозрачный куб льда</span>
+            </div>
+            <span class="menu-item-price">650 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="bar" data-image="/assets/interiour/XXXL (24).webp">
+            <div class="menu-row-main">
+              <span class="menu-item-name">Коктейль «Neon Sakura»</span>
+              <span class="menu-item-desc">Джин на лемонграссе, сакэ Junmai, личи, просекко, гидролат из лепестков сакуры</span>
+            </div>
+            <span class="menu-item-price">620 ₽</span>
+          </div>
+
+          <div class="menu-row" data-category="bar" data-image="/assets/dishes/XXXL (2).webp">
+            <div class="menu-row-main">
+              <span class="menu-item-name">Сливовое вино Choya Umeshu Reserva</span>
+              <span class="menu-item-desc">Традиционное японское ликерное вино с плодами сливы умэ, 150 мл</span>
+            </div>
+            <span class="menu-item-price">480 ₽</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           SECTION 4: BAR & NEON KOI CARPS
+           ==================================================================== -->
+      <section class="bar-koi-section">
+        <div class="container">
+          <div class="bar-koi-grid">
+            <div class="bar-tile-wall">
+              <img src="/assets/interiour/22723671_original.jpg" alt="Барная стойка Тайсё со светящимися неоновыми карпами" loading="lazy">
+            </div>
+
+            <div class="bar-info-col">
+              <div class="neon-koi-badge">
+                <svg class="koi-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 2C10 6 6 12 8 18C10 24 16 30 16 30C16 30 22 24 24 18C26 12 22 6 16 2Z" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M16 10C14 12 14 16 16 18C18 16 18 12 16 10Z" fill="#ffd000"/>
+                </svg>
+                <span class="mono-badge" style="color: #00f0ff;">[ НЕОНОВЫЕ КАРПЫ КОИ // БАР ]</span>
+              </div>
+
+              <h2 class="section-title" style="margin-top: 24px;">
+                МЕДЛЕННЫЙ БАР, <br>
+                <span class="accent">ЖИВЫЕ ОГНИ</span>
+              </h2>
+
+              <p class="hero-desc" style="margin-top: 18px;">
+                Вдоль нашей барной стойки плавно мерцают неоновые карпы кои. Здесь бармены смешивают коктейли на японском сакэ, редких ликерах и выдержанных азиатских дистиллятах под мягкий джаз и урбан-эмбиент.
+              </p>
+
+              <button id="bar-book-btn" class="btn-subzero" style="margin-top: 16px;">
+                <span class="btn-text">ЗАБРОНИРОВАТЬ МЕСТО У БАРА</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div> <!-- End of #main-scroll-content -->
+
+    <!-- ======================================================================
+         SECTION 5: TATTU REVEAL FOOTER (CURTAIN REVEAL EFFECT)
+         ====================================================================== -->
+    <footer id="tattu-reveal-footer">
+      <div class="footer-ambient-graphic" aria-hidden="true"></div>
+
+      <div class="container footer-top-grid">
+        <!-- Brand & Glow -->
+        <div class="footer-brand-col">
+          <div class="mono-badge">
+            <span class="dot"></span>
+            <span>ТАЙСЁ АЗИАТСКОЕ БИСТРО &amp; БАР</span>
+          </div>
+
+          <h2 class="footer-neon-signature">
+            ТАЙСЁ <br> НАВСЕГДА
+          </h2>
+
+          <p class="footer-brand-desc">
+            Место, где встречаются японский минимализм, шероховатость камня и теплота вечернего города. Приходите на неспешный ужин или ночной коктейль.
+          </p>
+
+          <div class="footer-info-details" style="display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 13px; color: #a4a6b0; margin-top: 16px;">
+            <span>📍 ЧЕЛЯБИНСК, УЛ. КРАСНАЯ, 4</span>
+            <span>🕒 ВС — ЧТ: 12:00 — 00:00</span>
+            <span>🕒 ПТ — СБ: 12:00 — 02:00</span>
+            <span>📞 +7 (351) 220-77-55</span>
+          </div>
+        </div>
+
+        <!-- Table Reservation Box -->
+        <div class="footer-booking-box">
+          <div class="booking-box-title">
+            <span>РЕЗЕРВ СТОЛА</span>
+            <span class="mono-badge" style="color: var(--neon-amber);">[ ОНЛАЙН ]</span>
+          </div>
+
+          <form id="table-booking-form" class="booking-form">
+            <div class="form-group">
+              <label class="form-label">ДАТА</label>
+              <input type="date" class="form-input" required value="2026-10-26">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ВРЕМЯ</label>
+              <select class="form-input" required>
+                <option value="19:00">19:00</option>
+                <option value="19:30">19:30</option>
+                <option value="20:00" selected>20:00</option>
+                <option value="20:30">20:30</option>
+                <option value="21:00">21:00</option>
+                <option value="22:00">22:00</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ГОСТИ</label>
+              <select class="form-input" required>
+                <option value="1">1 персона</option>
+                <option value="2" selected>2 персоны</option>
+                <option value="3">3 персоны</option>
+                <option value="4">4 персоны</option>
+                <option value="5+">5+ персон</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ЗОНА</label>
+              <select class="form-input">
+                <option value="hall">Основной зал</option>
+                <option value="bar">У барной стойки</option>
+                <option value="window">У круглого окна</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">ВАШЕ ИМЯ И ТЕЛЕФОН</label>
+              <input type="text" class="form-input" placeholder="Александр, +7 (999) 000-00-00" required>
+            </div>
+
+            <div class="form-group full-width booking-submit-btn">
+              <button type="submit" class="btn-subzero" style="width: 100%;">
+                <span class="btn-text">ПОДТВЕРДИТЬ БРОНИРОВАНИЕ</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Strip -->
+      <div class="container footer-bottom-bar">
+        <span>© 2026 ТАЙСЁ. ВСЕ ПРАВА ЗАЩИЩЕНЫ.</span>
+        <div class="footer-social-links">
+          <a href="#">TELEGRAM</a>
+          <a href="#">VKONTAKTE</a>
+          <a href="#">ЯНДЕКС КАРТЫ</a>
+        </div>
+        <span>CYBER WABI-SABI BISTRO &amp; BAR</span>
+      </div>
+    </footer>
+
+  </div> <!-- End of #night-experience -->
+
+  <!-- Main Javascript Application -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

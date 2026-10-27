@@ -1,0 +1,64 @@
+/* ==========================================================================
+   ТАЙСЁ (TAISE) — DESIGN TOKENS
+   Inspired by Japanese Wabi-Sabi, Urban Cyberpunk, Bürocratik & Floema
+   ========================================================================== */
+
+:root {
+  /* Day / Stone Twilight Palette (Exterior) */
+  --color-stone-bg: #1c1d21;
+  --color-stone-surface: #27282e;
+  --color-stone-tile: #d6cfc7;
+  --color-stone-tile-dark: #b8afa4;
+  --color-stone-border: rgba(255, 255, 255, 0.1);
+  --color-text-day: #e8e6e1;
+  --color-text-day-muted: #95948f;
+
+  /* Night Obsidian Palette (Interior Lounge) */
+  --color-night-bg: #0b0c0e;
+  --color-night-surface: #121418;
+  --color-night-card: #16181f;
+  --color-night-border: rgba(255, 255, 255, 0.08);
+  --color-night-text: #f4f3ef;
+  --color-night-muted: #82848c;
+
+  /* Signature Neon Tones (Extracted from Photos) */
+  --neon-amber: #ffd000;
+  --neon-amber-glow: rgba(255, 208, 0, 0.55);
+  --neon-warm-light: #ffe89e;
+  --neon-pink: #ff2a7a;
+  --neon-pink-glow: rgba(255, 42, 122, 0.5);
+  --neon-cyan: #00f0ff;
+  --neon-cyan-glow: rgba(0, 240, 255, 0.45);
+  --neon-purple: #9d4edd;
+  --neon-purple-glow: rgba(157, 78, 221, 0.4);
+
+  /* Wood & Organic Accents */
+  --color-wood-yakisugi: #181513;
+  --color-wood-warm: #a67c52;
+  --color-cherry-blossom: #fcf8f7;
+
+  /* Typography Stacks */
+  --font-logo: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Unbounded', 'Montserrat', sans-serif;
+  --font-editorial: 'Syne', 'Montserrat', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+  --font-subzero: 'Playfair Display', 'Cinzel', serif;
+
+  /* Motion & Easing */
+  --ease-cinematic: cubic-bezier(0.25, 1, 0.35, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snappy: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spacing & Layout */
+  --space-unit: 8px;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+  --space-3xl: 140px;
+
+  --container-max: 1600px;
+  --header-height: 80px;
+}

@@ -1,0 +1,159 @@
+/* ==========================================================================
+   BASE & TYPOGRAPHY SYSTEM
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--color-stone-bg);
+  color: var(--color-text-day);
+  font-family: var(--font-logo);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: auto; /* Handled smoothly by Lenis */
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-stone-bg);
+  overflow-x: hidden;
+  transition: background-color 1.2s var(--ease-cinematic), color 1.2s var(--ease-cinematic);
+}
+
+body.night-mode {
+  background-color: var(--color-night-bg);
+  color: var(--color-night-text);
+}
+
+/* Subtle Film Grain Noise Texture */
+.film-grain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Selection */
+::selection {
+  background: var(--neon-amber);
+  color: #000;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   BRAND LOGOTYPE & MACRON TYPOGRAPHY
+   Recreating the exact logotype from logo.png with horizontal macrons over Й & Ё
+   ========================================================================== */
+
+.brand-title {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-logo);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+/* Macron Character styling for Й and Ё */
+.has-macron {
+  position: relative;
+  display: inline-block;
+}
+
+.has-macron::before {
+  content: "";
+  position: absolute;
+  top: -0.16em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72%;
+  height: 0.12em;
+  background-color: currentColor;
+  border-radius: 1px;
+}
+
+.brand-subtitle {
+  font-family: var(--font-logo);
+  font-weight: 400;
+  font-size: 0.38em;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-text-day-muted);
+  margin-top: 0.4em;
+  display: block;
+  transition: color 0.6s ease;
+}
+
+body.night-mode .brand-subtitle {
+  color: var(--color-night-muted);
+}
+
+/* Bürocratik Architectural Monospace Badges */
+.mono-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-day-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mono-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-amber);
+  box-shadow: 0 0 8px var(--neon-amber-glow);
+  display: inline-block;
+}
+
+/* Container Layout */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-lg);
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    padding: 0 var(--space-xl);
+  }
+}

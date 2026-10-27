@@ -1,0 +1,208 @@
+/* ==========================================================================
+   HERO SCREEN (DAY / TWILIGHT 3D ARCHITECTURAL DIORAMA)
+   ========================================================================== */
+
+/* Main Header */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-md);
+  background: linear-gradient(180deg, rgba(16, 17, 20, 0.75) 0%, rgba(16, 17, 20, 0) 100%);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.6s ease;
+}
+
+@media (min-width: 768px) {
+  .site-header {
+    padding: 0 var(--space-xl);
+  }
+}
+
+.header-logo {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-logo .brand-title {
+  font-size: 26px;
+  color: #ffffff;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* Back to Street button (visible only in night mode) */
+.btn-back-street {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-night-muted);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-back-street:hover {
+  color: #ffffff;
+  border-color: var(--neon-amber);
+  box-shadow: 0 0 12px var(--neon-amber-glow);
+}
+
+body.night-mode .btn-back-street {
+  display: inline-flex;
+}
+
+/* Hero Section (Locked on initial load) */
+#hero-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  display: flex;
+  background: radial-gradient(circle at 75% 45%, #2a2c33 0%, #17181c 65%, #0f1013 100%);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+#hero-section.departed {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+/* Left Typography & Content Column */
+.hero-content-col {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 580px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--header-height) var(--space-md) var(--space-lg);
+  pointer-events: auto;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+@media (min-width: 768px) {
+  .hero-content-col {
+    padding-left: var(--space-xl);
+    padding-right: var(--space-md);
+  }
+}
+
+.hero-meta-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: var(--space-lg);
+}
+
+.hero-main-title {
+  font-size: clamp(48px, 6vw, 84px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+}
+
+.hero-subtitle {
+  font-family: var(--font-logo);
+  font-size: clamp(14px, 1.4vw, 19px);
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-stone-tile);
+  margin-bottom: var(--space-md);
+}
+
+.hero-desc {
+  font-family: var(--font-logo);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--color-text-day-muted);
+  max-width: 440px;
+  margin-bottom: var(--space-xl);
+}
+
+.hero-action-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-hint::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Right 3D Scene Container */
+.hero-3d-col {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+@media (min-width: 992px) {
+  .hero-3d-col {
+    width: 65%;
+  }
+}
+
+#hero-canvas-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Fullscreen Cinematic Black Fade Overlay */
+#portal-flash {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #000000;
+  opacity: 0;
+  pointer-events: none;
+}

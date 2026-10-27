@@ -1,0 +1,204 @@
+/* ==========================================================================
+   SUB ZERO DISTRESSED BUTTONS & TABS
+   Inspired by the distressed chalk / rough-edged grunge aesthetic
+   ========================================================================== */
+
+/* Distressed Border Filter (Applied via SVG filter or layered chalk styling) */
+.btn-subzero {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  background-color: transparent;
+  color: var(--color-night-text);
+  font-family: var(--font-subzero);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.35s var(--ease-snappy);
+}
+
+/* Distressed rough border using layered box-shadow and pseudo elements */
+.btn-subzero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.8);
+  /* Distressed chalky corner distortion */
+  clip-path: polygon(
+    0% 2px, 2px 0%, 98% 0%, 100% 3px,
+    99.5% 97%, 97% 100%, 3px 99.5%, 0% 97%
+  );
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.btn-subzero::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-subzero .btn-text {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  letter-spacing: 0.15em;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.btn-subzero:hover {
+  transform: translateY(-2px);
+}
+
+.btn-subzero:hover::before {
+  border-color: var(--neon-amber);
+  box-shadow: 
+    0 0 15px var(--neon-amber-glow),
+    inset 0 0 8px rgba(255, 208, 0, 0.2);
+}
+
+.btn-subzero:hover .btn-text {
+  color: var(--neon-amber);
+  text-shadow: 0 0 10px var(--neon-amber-glow);
+}
+
+/* Sub Zero Multi-Segment Tab Switcher [ ЕДА | АЛКО | СПЕШЛЫ ] */
+.subzero-tab-group {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  background: rgba(12, 13, 16, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 4px;
+}
+
+.subzero-tab-group::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  clip-path: polygon(
+    0% 1px, 2px 0%, 98.5% 0%, 100% 2px,
+    99.8% 98%, 98% 100%, 1.5% 99.8%, 0% 98%
+  );
+  pointer-events: none;
+}
+
+.subzero-tab {
+  position: relative;
+  padding: 12px 24px;
+  color: #c4c4be;
+  font-family: var(--font-subzero);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.subzero-tab .tab-title {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  text-decoration-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.subzero-tab:not(:last-child)::after {
+  content: "|";
+  position: absolute;
+  right: -2px;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 300;
+  pointer-events: none;
+}
+
+.subzero-tab:hover {
+  color: #ffffff;
+}
+
+.subzero-tab:hover .tab-title {
+  text-decoration-color: rgba(255, 255, 255, 0.6);
+}
+
+.subzero-tab.active {
+  color: #ffffff;
+}
+
+.subzero-tab.active .tab-title {
+  color: var(--neon-amber);
+  text-decoration-color: var(--neon-amber);
+  text-shadow: 0 0 12px var(--neon-amber-glow);
+}
+
+/* Glowing Neon Action CTA Button */
+.btn-enter-taise {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 36px;
+  background: rgba(20, 22, 26, 0.9);
+  color: var(--color-text-day);
+  font-family: var(--font-logo);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-smooth);
+}
+
+.btn-enter-taise::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 208, 0, 0.2), transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-enter-taise:hover {
+  border-color: var(--neon-amber);
+  box-shadow: 0 0 25px var(--neon-amber-glow), 0 8px 32px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.btn-enter-taise:hover::before {
+  left: 100%;
+}
+
+.btn-enter-taise .arrow-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.btn-enter-taise:hover .arrow-icon {
+  transform: translateX(4px);
+  color: var(--neon-amber);
+}
