@@ -27,8 +27,9 @@ export class HeroBuildingScene {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
+    // BasicShadowMap вместо PCFSoftShadowMap: в ~3 раза дешевле, потеря качества теней незначительна ночью
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.BasicShadowMap;
 
     this.container.appendChild(this.renderer.domElement);
 
@@ -45,6 +46,9 @@ export class HeroBuildingScene {
     this.scene.add(this.buildingGroup);
 
     window.__heroScene = this;
+
+    // Bind один раз — не создавать новый объект каждый кадр (устраняет GC-паузы)
+    this._boundAnimate = this.animate.bind(this);
 
     this.initMaterials();
     this.initLights();
@@ -697,9 +701,13 @@ export class HeroBuildingScene {
       metalness: 0.1
     });
 
-    // Glowing Lantern Bulb Core
-    this.lanternGlassMat = new THREE.MeshBasicMaterial({
-      color: 0xffd966
+    // Glowing Lantern Bulb Core & Radiance
+    this.lanternGlassMat = new THREE.MeshStandardMaterial({
+      color: 0xfff2cc,
+      emissive: 0xffaa33,
+      emissiveIntensity: 4.5,
+      roughness: 0.15,
+      metalness: 0.05
     });
 
     // Park Bench dark stained wood
@@ -722,7 +730,7 @@ export class HeroBuildingScene {
     const moonLight = new THREE.DirectionalLight(0x658bb2, 0.85);
     moonLight.position.set(14, 20, 15);
     moonLight.castShadow = true;
-    moonLight.shadow.mapSize.set(1024, 1024); // Optimized: sharp, clean shadows without GPU strain
+    moonLight.shadow.mapSize.set(512, 512); // 512 достаточно для ночной сцены, в 4 раза дешевле чем 1024
     moonLight.shadow.camera.near = 4;
     moonLight.shadow.camera.far = 42;
     moonLight.shadow.camera.left = -26;
@@ -744,14 +752,10 @@ export class HeroBuildingScene {
     this.porchLight.castShadow = false;
     this.buildingGroup.add(this.porchLight);
 
-    // Interior Warm Lights behind windows (radiant amber izakaya illumination)
-    const atriumLight = new THREE.PointLight(0xff9a26, 4.8, 10);
-    atriumLight.position.set(5.9, 3.1, -1.8);
+    // Interior Warm Lights behind windows — объединены в один источник для снижения GPU нагрузки
+    const atriumLight = new THREE.PointLight(0xff9a26, 5.5, 12);
+    atriumLight.position.set(4.0, 3.6, -2.2);
     this.buildingGroup.add(atriumLight);
-
-    const amoebaLight = new THREE.PointLight(0xff9a26, 3.5, 6);
-    amoebaLight.position.set(1.9, 4.65, -0.6);
-    this.buildingGroup.add(amoebaLight);
 
     const leftWinLight = new THREE.PointLight(0xff9420, 4.2, 12);
     leftWinLight.position.set(1.8, 3.1, -5.5);
@@ -851,121 +855,115 @@ export class HeroBuildingScene {
     this.porticoGroup.add(step2);
 
     // C. Enclose Portico Side Walls to eliminate empty voids (matching real building photos!)
-    // Right side connecting wall (from front wall x=3.55 into the porch to z=-1.65)
-    const rightSideWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.12, 1.70), this.facadeMat);
-    rightSideWall.position.set(3.42, 1.56, -0.85);
+    // Right side connecting wall (from front wall x=3.55 into the porch)
+    const rightSideWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.12, 1.8), this.facadeMat);
+    rightSideWall.position.set(3.42, 1.56, -0.9);
     rightSideWall.castShadow = true;
     this.porticoGroup.add(rightSideWall);
 
-    // Left glazed return wall (from z=-1.65 back to left facade arch at z=-3.2)
-    const leftSideWall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 3.12, 1.60), this.facadeMat);
-    leftSideWall.position.set(0.50, 1.56, -2.45);
+    // Left side connecting wall (from left wall z=-3.2 into the porch)
+    const leftSideWall = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.12, 0.35), this.facadeMat);
+    leftSideWall.position.set(0.9, 1.56, -3.02);
     leftSideWall.castShadow = true;
     this.porticoGroup.add(leftSideWall);
 
-    // Left connecting header above left arch reveal
-    const leftHeader = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.35, 0.35), this.facadeMat);
-    leftHeader.position.set(1.10, 2.95, -3.20);
-    this.porticoGroup.add(leftHeader);
+    // D. Angled Recessed Entrance Facade (diagonal orientation -45 deg across corner arch)
+    const entranceAngledGroup = new THREE.Group();
+    entranceAngledGroup.position.set(1.75, 0, -1.75);
+    entranceAngledGroup.rotation.y = -Math.PI / 4; // Diagonal (-45 degrees) as requested
+    this.porticoGroup.add(entranceAngledGroup);
 
-    // D. Forward-Facing Recessed Entrance Facade (parallel to front facade, matching porch-1.png & 3d-rakurs.png)
-    const entranceGroup = new THREE.Group();
-    entranceGroup.position.set(1.95, 0, -1.65);
-    entranceGroup.rotation.y = 0.0; // FACING FORWARD (+Z), exactly parallel to the front street facade!
-    this.porticoGroup.add(entranceGroup);
-
-    // Entrance Metal Perimeter Frame (neatly sized to doorway, zero wall penetration)
-    const eFrameW = 2.4;
-    const eFrameH = 2.9;
+    // Entrance Metal Perimeter Frame
+    const eFrameW = 3.6;
+    const eFrameH = 2.95;
     const eFrameDepth = 0.08;
 
     const topBeam = new THREE.Mesh(new THREE.BoxGeometry(eFrameW, 0.08, eFrameDepth), this.frameMat);
     topBeam.position.set(0, 2.9, 0);
-    entranceGroup.add(topBeam);
+    entranceAngledGroup.add(topBeam);
 
     const midBeam = new THREE.Mesh(new THREE.BoxGeometry(eFrameW, 0.06, eFrameDepth), this.frameMat);
     midBeam.position.set(0, 2.2, 0);
-    entranceGroup.add(midBeam);
+    entranceAngledGroup.add(midBeam);
 
     const botBeam = new THREE.Mesh(new THREE.BoxGeometry(eFrameW, 0.12, eFrameDepth), this.frameMat);
     botBeam.position.set(0, 0.06, 0);
-    entranceGroup.add(botBeam);
+    entranceAngledGroup.add(botBeam);
 
     // Vertical frame mullions (door jambs & side reveals)
-    [-1.15, -0.48, 0.48, 1.15].forEach(vx => {
+    [-1.6, -0.85, 0.85, 1.6].forEach(vx => {
       const vCol = new THREE.Mesh(new THREE.BoxGeometry(0.06, eFrameH, eFrameDepth), this.frameMat);
-      vCol.position.set(vx, 1.45, 0);
-      entranceGroup.add(vCol);
+      vCol.position.set(vx, 1.48, 0);
+      entranceAngledGroup.add(vCol);
     });
 
     // Glass transom panels above doors (y: 2.2 to 2.9)
-    const transomGlass = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 0.65), this.glassMat);
+    const transomGlass = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.65), this.glassMat);
     transomGlass.position.set(0, 2.55, 0.01);
-    entranceGroup.add(transomGlass);
+    entranceAngledGroup.add(transomGlass);
 
-    // Right-side fixed glass window panel with warm izakaya backing poster (matching real photo!)
-    const sideGlass = new THREE.Mesh(new THREE.PlaneGeometry(0.60, 2.05), this.glassMat);
-    sideGlass.position.set(0.82, 1.10, 0.01);
-    entranceGroup.add(sideGlass);
+    // Side fixed glass window panels with warm izakaya backing
+    const sideGlassL = new THREE.Mesh(new THREE.PlaneGeometry(0.70, 2.05), this.glassMat);
+    sideGlassL.position.set(-1.22, 1.10, 0.01);
+    entranceAngledGroup.add(sideGlassL);
 
-    const sideGlow = new THREE.Mesh(new THREE.PlaneGeometry(0.58, 2.00), this.interiorGlowMat);
-    sideGlow.position.set(0.82, 1.10, -0.05);
-    entranceGroup.add(sideGlow);
+    const sideGlassR = new THREE.Mesh(new THREE.PlaneGeometry(0.70, 2.05), this.glassMat);
+    sideGlassR.position.set(1.22, 1.10, 0.01);
+    entranceAngledGroup.add(sideGlassR);
 
-    // Left-side connecting infill panel to left wall
-    const leftFill = new THREE.Mesh(new THREE.BoxGeometry(0.30, 2.90, 0.06), this.frameMat);
-    leftFill.position.set(-1.30, 1.45, 0);
-    entranceGroup.add(leftFill);
+    const sideGlowR = new THREE.Mesh(new THREE.PlaneGeometry(0.68, 2.00), this.interiorGlowMat);
+    sideGlowR.position.set(1.22, 1.10, -0.05);
+    entranceAngledGroup.add(sideGlowR);
 
     // Deep Matte Pure Black Portal Chamber (strictly behind doorway, floor at y=-0.02 to eliminate all Z-fighting!)
     const blackVoidMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
 
-    // Back wall of black void chamber
-    const voidBack = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 2.9), blackVoidMat);
-    voidBack.position.set(0, 1.45, -4.5);
-    entranceGroup.add(voidBack);
+    // Back wall of black void chamber (deep behind entrance)
+    const voidBack = new THREE.Mesh(new THREE.PlaneGeometry(8, 6), blackVoidMat);
+    voidBack.position.set(0, 1.8, -5.0);
+    entranceAngledGroup.add(voidBack);
 
     // Left wall of black chamber
-    const voidLeft = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.9), blackVoidMat);
+    const voidLeft = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), blackVoidMat);
     voidLeft.rotation.y = Math.PI / 2;
-    voidLeft.position.set(-1.40, 1.45, -2.25);
-    entranceGroup.add(voidLeft);
+    voidLeft.position.set(-2.0, 1.8, -2.5);
+    entranceAngledGroup.add(voidLeft);
 
     // Right wall of black chamber
-    const voidRight = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.9), blackVoidMat);
+    const voidRight = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), blackVoidMat);
     voidRight.rotation.y = -Math.PI / 2;
-    voidRight.position.set(1.40, 1.45, -2.25);
-    entranceGroup.add(voidRight);
+    voidRight.position.set(2.0, 1.8, -2.5);
+    entranceAngledGroup.add(voidRight);
 
     // Floor of black chamber - positioned at y=-0.02 (strictly below y=0.00 to guarantee ZERO Z-fighting with porch!)
-    const voidFloor = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 4.5), blackVoidMat);
+    const voidFloor = new THREE.Mesh(new THREE.PlaneGeometry(4, 6), blackVoidMat);
     voidFloor.rotation.x = -Math.PI / 2;
-    voidFloor.position.set(0, -0.02, -2.25);
-    entranceGroup.add(voidFloor);
+    voidFloor.position.set(0, -0.02, -2.5);
+    entranceAngledGroup.add(voidFloor);
 
     // Ceiling of black chamber
-    const voidCeiling = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 4.5), blackVoidMat);
+    const voidCeiling = new THREE.Mesh(new THREE.PlaneGeometry(4, 6), blackVoidMat);
     voidCeiling.rotation.x = Math.PI / 2;
-    voidCeiling.position.set(0, 2.92, -2.25);
-    entranceGroup.add(voidCeiling);
+    voidCeiling.position.set(0, 3.2, -2.5);
+    entranceAngledGroup.add(voidCeiling);
 
     // Automatic Sliding Door Header Box (overhead mechanism in dark anodized aluminum)
     const headerBoxGeo = new THREE.BoxGeometry(2.1, 0.12, 0.08);
     const headerBox = new THREE.Mesh(headerBoxGeo, this.frameMat);
     headerBox.position.set(0, 2.18, 0.04);
-    entranceGroup.add(headerBox);
+    entranceAngledGroup.add(headerBox);
 
-    // E. High-Detail Sliding Glass Double Doors (Left & Right) facing forward (+Z)
+    // E. High-Detail Sliding Glass Double Doors (Left & Right)
     this.doorLeft = this.createDetailedDoorLeaf(true);
-    this.doorLeft.position.set(-0.44, 1.10, 0.03);
-    entranceGroup.add(this.doorLeft);
+    this.doorLeft.position.set(-0.43, 1.10, 0.03);
+    entranceAngledGroup.add(this.doorLeft);
 
     this.doorRight = this.createDetailedDoorLeaf(false);
-    this.doorRight.position.set(0.44, 1.10, 0.03);
-    entranceGroup.add(this.doorRight);
+    this.doorRight.position.set(0.43, 1.10, 0.03);
+    entranceAngledGroup.add(this.doorRight);
 
     // F. Dense Cascading Golden Fairy Lights Curtain (matching real photo!)
-    this.buildDenseFairyLights(entranceGroup);
+    this.buildDenseFairyLights(entranceAngledGroup);
 
     // G. Floating 3D Glowing Neon Sign «ТАЙСЁ АЗИАТСКОЕ БИСТРО» (no clunky black box!)
     this.buildNeonSign();
@@ -1342,7 +1340,7 @@ export class HeroBuildingScene {
     const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.65, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03 });
     const finMesh = new THREE.Mesh(finGeo, this.facadeMat);
     finMesh.position.set(0, 0, 0);
-    finMesh.castShadow = true;
+    finMesh.castShadow = false;
     pylonGroup.add(finMesh);
 
     // Solid connecting wall behind the top of the pylon (extends to X=3.4, overlapping right wing to guarantee 100% solid wall!)
@@ -1743,86 +1741,213 @@ export class HeroBuildingScene {
     backdropMesh.position.set(5.0, 7.0, -18.0);
     this.envGroup.add(backdropMesh);
 
-    // A. Architectural Stone Walkways (Тропинки вдоль здания)
-    // 1. Dedicated Left Stone Walkway along the entire left facade (X: 0 to -2.85, Z: +2.5 to -14.0)
-    // Sits flush at y=-0.38, seamlessly connecting the front plaza to the rear perimeter
-    const leftWalkwayGeo = new THREE.BoxGeometry(2.85, 0.06, 17.0);
+    // A. Architectural Stone Walkways wrapping directly around the building (Здание -> тропинка -> палисадник)
+    // 1. Dedicated Left Stone Walkway along the entire left facade (X: -1.8 to 0.0, Z: +1.8 to -14.5)
+    // Immediately adjacent to the building wall so guests can walk all the way around the left perimeter
+    const leftWalkwayGeo = new THREE.BoxGeometry(1.8, 0.06, 16.3);
     const leftWalkway = new THREE.Mesh(leftWalkwayGeo, this.pavingMat);
-    leftWalkway.position.set(-1.425, -0.38, -5.75);
+    leftWalkway.position.set(-0.9, -0.38, -6.35);
     leftWalkway.receiveShadow = true;
     this.envGroup.add(leftWalkway);
 
-    // 2. Wide Front Stone Promenade in front of the building (X: -2.85 to +16.5, Z: 0.0 to +7.0)
-    // Ensures both the main porch and second entrance stairs sit cleanly on continuous stone paving
-    const frontPromGeo = new THREE.BoxGeometry(19.4, 0.06, 7.0);
-    const frontProm = new THREE.Mesh(frontPromGeo, this.pavingMat);
-    frontProm.position.set(6.8, -0.38, 3.5);
-    frontProm.receiveShadow = true;
-    this.envGroup.add(frontProm);
+    // 2. Front Stone Walkway immediately adjacent to the building front facade (Z: 0.0 to +1.8, X: -1.8 to +16.5)
+    // Runs right beside the facade walls, seamlessly connecting to the left walkway so visitors can walk around the building
+    const frontWalkwayGeo = new THREE.BoxGeometry(18.3, 0.06, 1.8);
+    const frontWalkway = new THREE.Mesh(frontWalkwayGeo, this.pavingMat);
+    frontWalkway.position.set(7.35, -0.38, 0.9);
+    frontWalkway.receiveShadow = true;
+    this.envGroup.add(frontWalkway);
 
-    // B. Granite Curbs (Бордюры вдоль тропинки и палисадников, не перекрывающие проход)
-    // 1. Left Granite Curb: runs along the left walkway border at X=-2.95 from Z=-14.0 to Z=+1.5
-    const leftCurbStraightGeo = new THREE.BoxGeometry(0.18, 0.14, 15.5);
-    const leftCurbStraight = new THREE.Mesh(leftCurbStraightGeo, this.curbMat);
-    leftCurbStraight.position.set(-2.95, -0.34, -6.25);
-    leftCurbStraight.receiveShadow = true;
-    this.envGroup.add(leftCurbStraight);
+    // 3. Main Entrance Walkway Passage across palisade (X: +0.6 to +3.2, Z: +1.8 to +5.2)
+    // Paved stone walkway connecting the street plaza directly to the corner porch diagonal entrance steps
+    const mainPorchPathGeo = new THREE.BoxGeometry(2.6, 0.06, 3.4);
+    const mainPorchPath = new THREE.Mesh(mainPorchPathGeo, this.pavingMat);
+    mainPorchPath.position.set(1.9, -0.38, 3.5);
+    mainPorchPath.receiveShadow = true;
+    this.envGroup.add(mainPorchPath);
 
-    // Smooth outward curve at Z=+1.5 flaring open to X=-4.5, Z=+3.2 (keeping the walkway entrance completely open!)
-    const leftCurbCornerGeo = new THREE.BoxGeometry(2.0, 0.14, 0.18);
-    const leftCurbCorner = new THREE.Mesh(leftCurbCornerGeo, this.curbMat);
-    leftCurbCorner.rotation.y = -Math.PI / 4;
-    leftCurbCorner.position.set(-3.7, -0.34, 2.25);
-    this.envGroup.add(leftCurbCorner);
+    // 4. Second Entrance Walkway Passage across palisade (X: +7.6 to +10.0, Z: +1.8 to +5.2)
+    // Paved stone walkway connecting street plaza to the wooden stairs under the sculptural pylon
+    const secondEntrancePathGeo = new THREE.BoxGeometry(2.4, 0.06, 3.4);
+    const secondEntrancePath = new THREE.Mesh(secondEntrancePathGeo, this.pavingMat);
+    secondEntrancePath.position.set(8.8, -0.38, 3.5);
+    secondEntrancePath.receiveShadow = true;
+    this.envGroup.add(secondEntrancePath);
 
-    // 2. Right Granite Curb: protects the second entrance! Starts strictly at X=16.5 (>6m past second entrance stairs at X=8.8!)
-    const rightCurbStraightGeo = new THREE.BoxGeometry(0.18, 0.14, 15.5);
-    const rightCurbStraight = new THREE.Mesh(rightCurbStraightGeo, this.curbMat);
-    rightCurbStraight.position.set(16.5, -0.34, -6.25);
-    rightCurbStraight.receiveShadow = true;
-    this.envGroup.add(rightCurbStraight);
+    // 5. Outer Street Promenade / Plaza in front of palisades (Z: +5.2 to +10.5, X: -3.8 to +19.5)
+    const outerPromGeo = new THREE.BoxGeometry(23.3, 0.06, 5.3);
+    const outerProm = new THREE.Mesh(outerPromGeo, this.pavingMat);
+    outerProm.position.set(7.85, -0.38, 7.85);
+    outerProm.receiveShadow = true;
+    this.envGroup.add(outerProm);
 
-    const rightCurbCornerGeo = new THREE.BoxGeometry(2.0, 0.14, 0.18);
-    const rightCurbCorner = new THREE.Mesh(rightCurbCornerGeo, this.curbMat);
-    rightCurbCorner.rotation.y = Math.PI / 4;
-    rightCurbCorner.position.set(17.25, -0.34, 2.25);
-    this.envGroup.add(rightCurbCorner);
+    // B. Granite Curbs framing Walkways and Front Palisades (Бордюры вокруг палисадников и дорожек)
+    // 1. Left Walkway Outer Curb (X = -1.85, Z: -14.5 to +1.8)
+    const leftCurbGeo = new THREE.BoxGeometry(0.18, 0.14, 16.3);
+    const leftCurb = new THREE.Mesh(leftCurbGeo, this.curbMat);
+    leftCurb.position.set(-1.85, -0.32, -6.35);
+    leftCurb.receiveShadow = true;
+    this.envGroup.add(leftCurb);
 
-    // C. Palisades / Garden Beds (Палисадники с кустами и деревьями)
-    // 1. Left Palisade Turf Bed: sits strictly behind the left curb at X <= -3.05 (Z: +3.2 to -16.0)
-    // Never enters the walkway, porch, or restaurant!
-    const leftLawnGeo = new THREE.BoxGeometry(18.0, 0.05, 20.0);
+    // 2. Bed 1 Curbs (Left Front Palisade: X: -3.6 to +0.6, Z: 1.8 to 5.2)
+    const curbB1Walk = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.14, 0.18), this.curbMat);
+    curbB1Walk.position.set(-1.5, -0.32, 1.8);
+    curbB1Walk.receiveShadow = true;
+    this.envGroup.add(curbB1Walk);
+
+    const curbB1Street = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.14, 0.18), this.curbMat);
+    curbB1Street.position.set(-1.5, -0.32, 5.2);
+    curbB1Street.receiveShadow = true;
+    this.envGroup.add(curbB1Street);
+
+    const curbB1Left = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB1Left.position.set(-3.6, -0.32, 3.5);
+    curbB1Left.receiveShadow = true;
+    this.envGroup.add(curbB1Left);
+
+    const curbB1Right = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB1Right.position.set(0.6, -0.32, 3.5);
+    curbB1Right.receiveShadow = true;
+    this.envGroup.add(curbB1Right);
+
+    // 3. Bed 2 Curbs (Center Front Palisade under windows: X: 3.2 to 7.6, Z: 1.8 to 5.2)
+    const curbB2Walk = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.14, 0.18), this.curbMat);
+    curbB2Walk.position.set(5.4, -0.32, 1.8);
+    curbB2Walk.receiveShadow = true;
+    this.envGroup.add(curbB2Walk);
+
+    const curbB2Street = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.14, 0.18), this.curbMat);
+    curbB2Street.position.set(5.4, -0.32, 5.2);
+    curbB2Street.receiveShadow = true;
+    this.envGroup.add(curbB2Street);
+
+    const curbB2Left = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB2Left.position.set(3.2, -0.32, 3.5);
+    curbB2Left.receiveShadow = true;
+    this.envGroup.add(curbB2Left);
+
+    const curbB2Right = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB2Right.position.set(7.6, -0.32, 3.5);
+    curbB2Right.receiveShadow = true;
+    this.envGroup.add(curbB2Right);
+
+    // 4. Bed 3 Curbs (Right Front Palisade in front of right wing: X: 10.0 to 16.5, Z: 1.8 to 5.2)
+    const curbB3Walk = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.14, 0.18), this.curbMat);
+    curbB3Walk.position.set(13.25, -0.32, 1.8);
+    curbB3Walk.receiveShadow = true;
+    this.envGroup.add(curbB3Walk);
+
+    const curbB3Street = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.14, 0.18), this.curbMat);
+    curbB3Street.position.set(13.25, -0.32, 5.2);
+    curbB3Street.receiveShadow = true;
+    this.envGroup.add(curbB3Street);
+
+    const curbB3Left = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB3Left.position.set(10.0, -0.32, 3.5);
+    curbB3Left.receiveShadow = true;
+    this.envGroup.add(curbB3Left);
+
+    const curbB3Right = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 3.4), this.curbMat);
+    curbB3Right.position.set(16.5, -0.32, 3.5);
+    curbB3Right.receiveShadow = true;
+    this.envGroup.add(curbB3Right);
+
+    // 5. Right Park Boundary Curb (X = 16.5, Z: -14.5 to +1.8)
+    const rightParkCurb = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 16.3), this.curbMat);
+    rightParkCurb.position.set(16.5, -0.32, -6.35);
+    rightParkCurb.receiveShadow = true;
+    this.envGroup.add(rightParkCurb);
+
+    // C. Palisades / Garden Beds (Палисадники с мягким ночным газоном)
+    // 1. Left Palisade Turf Bed: sits behind left curb (X <= -1.9, Z: +1.8 to -16.0)
+    const leftLawnGeo = new THREE.BoxGeometry(18.0, 0.05, 18.0);
     const leftLawn = new THREE.Mesh(leftLawnGeo, this.lawnMat);
-    leftLawn.position.set(-12.1, -0.39, -6.5);
+    leftLawn.position.set(-10.9, -0.36, -7.0);
     leftLawn.receiveShadow = true;
     this.envGroup.add(leftLawn);
 
-    // 2. Right Park Turf Bed: sits strictly behind right curb at X >= 16.65 (>7m clear of second entrance stairs!)
-    const rightLawnGeo = new THREE.BoxGeometry(18.0, 0.05, 20.0);
+    // 2. Front Palisade Bed 1 Turf (Left Front Palisade: X: -3.6 to +0.6, Z: 1.8 to 5.2)
+    const frontLawn1Geo = new THREE.BoxGeometry(4.0, 0.05, 3.2);
+    const frontLawn1 = new THREE.Mesh(frontLawn1Geo, this.lawnMat);
+    frontLawn1.position.set(-1.5, -0.36, 3.5);
+    frontLawn1.receiveShadow = true;
+    this.envGroup.add(frontLawn1);
+
+    // 3. Front Palisade Bed 2 Turf (Center Front Palisade under windows: X: 3.2 to 7.6, Z: 1.8 to 5.2)
+    const frontLawn2Geo = new THREE.BoxGeometry(4.2, 0.05, 3.2);
+    const frontLawn2 = new THREE.Mesh(frontLawn2Geo, this.lawnMat);
+    frontLawn2.position.set(5.4, -0.36, 3.5);
+    frontLawn2.receiveShadow = true;
+    this.envGroup.add(frontLawn2);
+
+    // 4. Front Palisade Bed 3 Turf (Right Front Palisade in front of right wing: X: 10.0 to 16.5, Z: 1.8 to 5.2)
+    const frontLawn3Geo = new THREE.BoxGeometry(6.3, 0.05, 3.2);
+    const frontLawn3 = new THREE.Mesh(frontLawn3Geo, this.lawnMat);
+    frontLawn3.position.set(13.25, -0.36, 3.5);
+    frontLawn3.receiveShadow = true;
+    this.envGroup.add(frontLawn3);
+
+    // 5. Right Park Turf Bed: sits strictly behind right curb (X >= 16.6)
+    const rightLawnGeo = new THREE.BoxGeometry(18.0, 0.05, 18.0);
     const rightLawn = new THREE.Mesh(rightLawnGeo, this.lawnMat);
-    rightLawn.position.set(25.6, -0.39, -6.5);
+    rightLawn.position.set(25.5, -0.36, -7.0);
     rightLawn.receiveShadow = true;
     this.envGroup.add(rightLawn);
 
-    // D. DENSE BUSH & SHRUB HEDGES (Палисадник с кустами вдоль тропинки и задний план)
-    // 1. Left Palisade Shrub Hedges: positioned along the curb line (X: -3.8 to -5.5)
+    // D. DENSE BUSH & SHRUB HEDGES (Палисадники с кустарниками и деревьями)
+    // 1. Front Palisade Bed 1 (Лицевой палисадник слева от входа — пышные кусты и декоративная сосенка)
+    const frontBushes1 = this.createShrubCluster(18, 3.8, 2.6, 0.85, 1.25);
+    frontBushes1.position.set(-1.5, 0, 3.5);
+    this.envGroup.add(frontBushes1);
+
+    const frontConifer1 = this.createOrganicConiferTree(3, 3.4, 1.3);
+    frontConifer1.position.set(-2.4, 0, 3.6);
+    frontConifer1.rotation.y = 0.6;
+    this.envGroup.add(frontConifer1);
+
+    // 2. Front Palisade Bed 2 (Лицевой палисадник между входами — японские кустарники под окнами)
+    const frontBushes2 = this.createShrubCluster(22, 3.8, 2.6, 0.72, 1.15);
+    frontBushes2.position.set(5.4, 0, 3.5);
+    this.envGroup.add(frontBushes2);
+
+    const frontConifer2 = this.createOrganicConiferTree(2, 2.8, 1.1);
+    frontConifer2.position.set(3.8, 0, 3.8);
+    frontConifer2.rotation.y = 1.1;
+    this.envGroup.add(frontConifer2);
+
+    // 3. Front Palisade Bed 3 (Лицевой палисадник перед правым крылом — высокие хвойные и кусты)
+    const frontBushes3 = this.createShrubCluster(20, 5.8, 2.6, 0.95, 1.35);
+    frontBushes3.position.set(13.25, 0, 3.5);
+    this.envGroup.add(frontBushes3);
+
+    const frontConifer3 = this.createOrganicConiferTree(1, 6.5, 2.3);
+    frontConifer3.position.set(12.8, 0, 3.8);
+    frontConifer3.rotation.y = -0.7;
+    this.envGroup.add(frontConifer3);
+
+    const frontConifer4 = this.createOrganicConiferTree(2, 5.2, 1.9);
+    frontConifer4.position.set(15.2, 0, 3.6);
+    frontConifer4.rotation.y = 1.2;
+    this.envGroup.add(frontConifer4);
+
+    // 3. Left Palisade Shrub Hedges (along the left walkway border at X: -3.2 to -5.0)
     const leftBushes1 = this.createShrubCluster(18, 2.5, 7.0, 1.25, 1.6);
-    leftBushes1.position.set(-4.2, 0, -3.5);
+    leftBushes1.position.set(-3.8, 0, -3.5);
     this.envGroup.add(leftBushes1);
 
     const leftBushes2 = this.createShrubCluster(20, 3.0, 8.0, 1.35, 1.7);
-    leftBushes2.position.set(-4.5, 0, -10.5);
+    leftBushes2.position.set(-4.0, 0, -10.5);
     this.envGroup.add(leftBushes2);
 
-    const leftBushes3 = this.createShrubCluster(14, 4.0, 4.0, 1.20, 1.5);
-    leftBushes3.position.set(-5.5, 0, 1.8);
+    const leftBushes3 = this.createShrubCluster(14, 3.5, 3.5, 1.20, 1.5);
+    leftBushes3.position.set(-4.5, 0, 1.8);
     this.envGroup.add(leftBushes3);
 
     const leftBushesDeep = this.createShrubCluster(22, 10.0, 12.0, 1.45, 1.8);
     leftBushesDeep.position.set(-10.5, 0, -6.5);
     this.envGroup.add(leftBushesDeep);
 
-    // 2. Continuous Back Boundary Shrub Hedge (behind the entire building length, completely sealing horizon seam!)
+    // 4. Continuous Back Boundary Shrub Hedge (behind the entire building length, completely sealing horizon seam!)
     const backBushes1 = this.createShrubCluster(28, 16.0, 5.0, 1.55, 2.2);
     backBushes1.position.set(-2.0, 0, -16.0);
     this.envGroup.add(backBushes1);
@@ -1835,7 +1960,7 @@ export class HeroBuildingScene {
     backBushes3.position.set(5.0, 0, -18.5);
     this.envGroup.add(backBushes3);
 
-    // 3. Right Palisade Shrub Hedges (starting strictly at X >= 17.2, zero touch with second entrance!)
+    // 5. Right Park Shrub Hedges (starting at X >= 17.0)
     const rightBushes1 = this.createShrubCluster(18, 3.0, 7.0, 1.35, 1.7);
     rightBushes1.position.set(18.0, 0, -3.5);
     this.envGroup.add(rightBushes1);
@@ -2005,29 +2130,42 @@ export class HeroBuildingScene {
     coniferR2.rotation.y = -1.2;
     this.envGroup.add(coniferR2);
 
-    // H. Park Lanterns & Benches along the promenade edge and walkway
-    // Left Walkway Lantern (casts a warm atmospheric glow down the stone path, curb & shrubs)
-    const lanternWalkway = this.createParkLantern();
-    lanternWalkway.position.set(-2.95, 0, -5.5);
-    this.envGroup.add(lanternWalkway);
+    // H. Park Lanterns & Benches along the walkways, entrance approaches, and front palisades
+    // 1. Left Palisade Lantern (illuminates left front palisade shrubs and lawn)
+    const lanternLeftGarden = this.createParkLantern();
+    lanternLeftGarden.position.set(-3.2, 0, 3.2);
+    this.envGroup.add(lanternLeftGarden);
 
-    const lanternL = this.createParkLantern();
-    lanternL.position.set(-3.2, 0, 2.2);
-    this.envGroup.add(lanternL);
+    // 2. Main Entrance Street Approach Lantern (illuminates entrance path and bench from street)
+    const lanternMainApproach = this.createParkLantern();
+    lanternMainApproach.position.set(-0.4, 0, 5.4);
+    this.envGroup.add(lanternMainApproach);
 
-    const benchL = this.createParkBench();
-    benchL.position.set(-3.5, 0, 4.0);
-    benchL.rotation.y = 0.15;
-    this.envGroup.add(benchL);
+    // 3. Second Entrance Street Approach Lantern (illuminates cross-path to pylon wooden stairs)
+    const lanternSecondApproach = this.createParkLantern();
+    lanternSecondApproach.position.set(9.8, 0, 5.4);
+    this.envGroup.add(lanternSecondApproach);
 
-    const lanternR = this.createParkLantern();
-    lanternR.position.set(15.2, 0, 2.6);
-    this.envGroup.add(lanternR);
+    // 4. Outer Right Promenade Lantern (illuminates right wing palisade corner)
+    const lanternRight = this.createParkLantern();
+    lanternRight.position.set(16.5, 0, 3.2);
+    this.envGroup.add(lanternRight);
 
-    const benchR = this.createParkBench();
-    benchR.position.set(15.2, 0, 4.2);
-    benchR.rotation.y = -0.15;
-    this.envGroup.add(benchR);
+    // 5. Left Walkway Mid-Length Lantern (illuminates pedestrian path along left facade)
+    const lanternLeftWalkway = this.createParkLantern();
+    lanternLeftWalkway.position.set(-1.85, 0, -5.5);
+    this.envGroup.add(lanternLeftWalkway);
+
+    // Park Benches in the open promenade
+    const benchMain = this.createParkBench();
+    benchMain.position.set(-1.5, 0, 6.8);
+    benchMain.rotation.y = 0.15;
+    this.envGroup.add(benchMain);
+
+    const benchSecond = this.createParkBench();
+    benchSecond.position.set(8.8, 0, 6.8);
+    benchSecond.rotation.y = -0.1;
+    this.envGroup.add(benchSecond);
   }
 
   /**
@@ -2197,7 +2335,7 @@ export class HeroBuildingScene {
     if (trunkGeos.length > 0) {
       const mergedTrunk = BufferGeometryUtils.mergeGeometries(trunkGeos, false);
       const trunkMesh = new THREE.Mesh(mergedTrunk, this.spruceBarkMat);
-      trunkMesh.castShadow = true;
+      trunkMesh.castShadow = false;
       treeGroup.add(trunkMesh);
     }
 
@@ -2205,7 +2343,7 @@ export class HeroBuildingScene {
     if (boughGeos.length > 0) {
       const mergedBoughs = BufferGeometryUtils.mergeGeometries(boughGeos, false);
       const boughMesh = new THREE.Mesh(mergedBoughs, this.spruceBarkMat);
-      boughMesh.castShadow = true;
+      boughMesh.castShadow = false;
       treeGroup.add(boughMesh);
     }
 
@@ -2358,14 +2496,14 @@ export class HeroBuildingScene {
     if (lowerTrunkGeos.length > 0) {
       const mergedLower = BufferGeometryUtils.mergeGeometries(lowerTrunkGeos, false);
       const lowerMesh = new THREE.Mesh(mergedLower, this.pineBarkMat);
-      lowerMesh.castShadow = true;
+      lowerMesh.castShadow = false;
       pineGroup.add(lowerMesh);
     }
 
     if (orangeWoodGeos.length > 0) {
       const mergedUpper = BufferGeometryUtils.mergeGeometries(orangeWoodGeos, false);
       const upperMesh = new THREE.Mesh(mergedUpper, this.pineOrangeBarkMat);
-      upperMesh.castShadow = true;
+      upperMesh.castShadow = false;
       pineGroup.add(upperMesh);
     }
 
@@ -2382,7 +2520,7 @@ export class HeroBuildingScene {
   }
 
   /**
-   * Modern Architectural Park Lantern Post (Screenshot 2)
+   * Modern Architectural Park Lantern Post with warm radiant glow and light pool on ground
    */
   createParkLantern() {
     const lanternGroup = new THREE.Group();
@@ -2391,14 +2529,14 @@ export class HeroBuildingScene {
     const baseGeo = new THREE.CylinderGeometry(0.18, 0.24, 0.22, 8);
     const baseMesh = new THREE.Mesh(baseGeo, this.frameMat);
     baseMesh.position.y = 0.11;
-    baseMesh.castShadow = true;
+    baseMesh.castShadow = false;
     lanternGroup.add(baseMesh);
 
     // Slender Dark Metal Pole (height 3.2m)
     const poleGeo = new THREE.CylinderGeometry(0.045, 0.065, 3.2, 8);
     const pole = new THREE.Mesh(poleGeo, this.frameMat);
     pole.position.y = 1.71;
-    pole.castShadow = true;
+    pole.castShadow = false;
     lanternGroup.add(pole);
 
     // Decorative Flared Bracket Collar
@@ -2407,7 +2545,7 @@ export class HeroBuildingScene {
     collar.position.y = 3.28;
     lanternGroup.add(collar);
 
-    // Modern Inverted Flared Lantern Head
+    // Modern Inverted Flared Lantern Head Housing
     const headHousingGeo = new THREE.CylinderGeometry(0.32, 0.16, 0.45, 4);
     const headHousing = new THREE.Mesh(headHousingGeo, this.frameMat);
     headHousing.position.y = 3.52;
@@ -2415,7 +2553,7 @@ export class HeroBuildingScene {
     lanternGroup.add(headHousing);
 
     // Glowing Luminous Amber Core Bulb
-    const bulbGeo = new THREE.BoxGeometry(0.2, 0.32, 0.2);
+    const bulbGeo = new THREE.BoxGeometry(0.22, 0.34, 0.22);
     const bulb = new THREE.Mesh(bulbGeo, this.lanternGlassMat);
     bulb.position.y = 3.52;
     bulb.rotation.y = Math.PI / 4;
@@ -2426,14 +2564,43 @@ export class HeroBuildingScene {
     const cap = new THREE.Mesh(capGeo, this.frameMat);
     cap.position.y = 3.81;
     cap.rotation.y = Math.PI / 4;
-    cap.castShadow = true;
+    cap.castShadow = false;
     lanternGroup.add(cap);
 
-    // Warm Atmosphere Point Light (illuminates surrounding trees and pavement)
-    const lanternLight = new THREE.PointLight(0xffc25c, 3.6, 12.0);
+    // Warm Atmospheric Point Light (освещает окружающие деревья и воздух)
+    const lanternLight = new THREE.PointLight(0xffb84d, 3.8, 9.5, 2.0);
     lanternLight.position.set(0, 3.52, 0);
     lanternLight.castShadow = false;
     lanternGroup.add(lanternLight);
+    // groundFillLight убран: эмиссивный материал + ground pool декаль дают тот же визуальный эффект без GPU нагрузки
+
+    // 3. Subtle luminous ground light pool decal (soft circular ambient illumination on paving/lawn around lantern base)
+    if (!this._lanternGroundPoolTex) {
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 128;
+      pCanvas.height = 128;
+      const pCtx = pCanvas.getContext('2d');
+      const pGrad = pCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      pGrad.addColorStop(0, 'rgba(255, 185, 70, 0.55)');
+      pGrad.addColorStop(0.35, 'rgba(255, 150, 40, 0.28)');
+      pGrad.addColorStop(0.7, 'rgba(255, 120, 20, 0.08)');
+      pGrad.addColorStop(1, 'rgba(255, 100, 10, 0)');
+      pCtx.fillStyle = pGrad;
+      pCtx.fillRect(0, 0, 128, 128);
+      this._lanternGroundPoolTex = new THREE.CanvasTexture(pCanvas);
+    }
+
+    const poolGeo = new THREE.PlaneGeometry(4.8, 4.8);
+    const poolMat = new THREE.MeshBasicMaterial({
+      map: this._lanternGroundPoolTex,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const poolMesh = new THREE.Mesh(poolGeo, poolMat);
+    poolMesh.rotation.x = -Math.PI / 2;
+    poolMesh.position.y = 0.03; // slightly above base
+    lanternGroup.add(poolMesh);
 
     return lanternGroup;
   }
@@ -2448,7 +2615,7 @@ export class HeroBuildingScene {
     const bodyGeo = new THREE.BoxGeometry(0.42, 0.68, 0.42);
     const body = new THREE.Mesh(bodyGeo, this.frameMat);
     body.position.y = 0.34;
-    body.castShadow = true;
+    body.castShadow = false;
     urnGroup.add(body);
 
     // Inner rim top
@@ -2472,7 +2639,7 @@ export class HeroBuildingScene {
       const legGeo = new THREE.BoxGeometry(0.05, 0.45, 0.48);
       const leg = new THREE.Mesh(legGeo, this.frameMat);
       leg.position.set(bx, 0.225, 0);
-      leg.castShadow = true;
+      leg.castShadow = false;
       benchGroup.add(leg);
 
       // Backrest stanchion
@@ -2480,7 +2647,7 @@ export class HeroBuildingScene {
       const backStanchion = new THREE.Mesh(backStanchionGeo, this.frameMat);
       backStanchion.position.set(bx, 0.62, -0.22);
       backStanchion.rotation.x = -0.12;
-      backStanchion.castShadow = true;
+      backStanchion.castShadow = false;
       benchGroup.add(backStanchion);
     });
 
@@ -2490,7 +2657,7 @@ export class HeroBuildingScene {
       const slatGeo = new THREE.BoxGeometry(1.6, 0.035, 0.085);
       const slat = new THREE.Mesh(slatGeo, this.benchWoodMat);
       slat.position.set(0, 0.46, sz);
-      slat.castShadow = true;
+      slat.castShadow = false;
       benchGroup.add(slat);
     }
 
@@ -2502,7 +2669,7 @@ export class HeroBuildingScene {
       const bSlat = new THREE.Mesh(bSlatGeo, this.benchWoodMat);
       bSlat.position.set(0, by, bz);
       bSlat.rotation.x = -0.12;
-      bSlat.castShadow = true;
+      bSlat.castShadow = false;
       benchGroup.add(bSlat);
     }
 
@@ -2578,20 +2745,20 @@ export class HeroBuildingScene {
       }, 0.3);
     }
 
-    // 2. Camera glides straight forward through the open doors into the pure black void
+    // 2. Camera glides smoothly through the diagonal open doors into the pure black void
     timeline.to(this.camera.position, {
-      x: 0.40,
-      y: 1.0,
-      z: -3.22,
+      x: 1.2,
+      y: 1.35,
+      z: -1.8,
       duration: 2.0,
       ease: 'power3.inOut'
     }, 0);
 
     const targetObj = { x: this.initialTarget.x, y: this.initialTarget.y, z: this.initialTarget.z };
     timeline.to(targetObj, {
-      x: -1.54,
-      y: 1.0,
-      z: -6.61,
+      x: 1.2,
+      y: 1.35,
+      z: -6.0,
       duration: 2.0,
       ease: 'power3.inOut',
       onUpdate: () => {
@@ -2624,8 +2791,8 @@ export class HeroBuildingScene {
     });
 
     // Position camera just inside doorway before pulling back
-    this.camera.position.set(0.40, 1.0, -3.22);
-    this.camera.lookAt(-1.54, 1.0, -6.61);
+    this.camera.position.set(1.2, 1.35, -1.8);
+    this.camera.lookAt(1.2, 1.35, -6.0);
 
     // 1. Camera glides smoothly back outside to street view
     timeline.to(this.camera.position, {
@@ -2636,7 +2803,7 @@ export class HeroBuildingScene {
       ease: 'power3.out'
     }, 0);
 
-    const targetObj = { x: -1.54, y: 1.0, z: -6.61 };
+    const targetObj = { x: 1.2, y: 1.35, z: -6.0 };
     timeline.to(targetObj, {
       x: this.initialTarget.x,
       y: this.initialTarget.y,
@@ -2651,13 +2818,13 @@ export class HeroBuildingScene {
     // 2. Sliding doors close smoothly as camera clears the doorway
     if (this.doorLeft && this.doorRight) {
       timeline.to(this.doorLeft.position, {
-        x: -0.44,
+        x: -0.43,
         duration: 0.9,
         ease: 'power2.inOut'
       }, 0.4);
 
       timeline.to(this.doorRight.position, {
-        x: 0.44,
+        x: 0.43,
         duration: 0.9,
         ease: 'power2.inOut'
       }, 0.4);
@@ -2696,7 +2863,7 @@ export class HeroBuildingScene {
 
   animate() {
     if (this.isPaused) return;
-    requestAnimationFrame(this.animate.bind(this));
+    requestAnimationFrame(this._boundAnimate);
 
     // Mouse Parallax Damping
     if (!this.isTransitioning) {
