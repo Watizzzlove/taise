@@ -80,8 +80,7 @@
   display: inline-flex;
   align-items: center;
   position: relative;
-  background: rgba(12, 13, 16, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(14, 16, 20, 0.95);
   padding: 4px;
 }
 

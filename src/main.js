@@ -72,6 +72,9 @@ class TaiseApp {
           heroSection.classList.add('departed');
           nightExperience.classList.add('active');
 
+          // Pause 3D render loop to ensure 0% GPU/CPU usage while inside the lounge
+          this.heroScene.pause();
+
           // Unlock smooth scrolling at top of night lounge
           window.scrollTo(0, 0);
           this.lenis.start();
@@ -108,6 +111,9 @@ class TaiseApp {
             heroSection.classList.remove('departed');
             nightExperience.classList.remove('active');
             window.scrollTo(0, 0);
+
+            // Resume 3D rendering before starting camera glide back outside
+            this.heroScene.resume();
 
             this.heroScene.flyBackToStreet(() => {
               this.isInside = false;

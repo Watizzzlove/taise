@@ -14,8 +14,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-md);
-  background: linear-gradient(180deg, rgba(16, 17, 20, 0.75) 0%, rgba(16, 17, 20, 0) 100%);
-  backdrop-filter: blur(8px);
+  background: rgba(14, 15, 18, 0.95);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.6s ease;
 }
@@ -79,7 +78,7 @@ body.night-mode .btn-back-street {
   min-height: 640px;
   overflow: hidden;
   display: flex;
-  background: radial-gradient(circle at 75% 45%, #2a2c33 0%, #17181c 65%, #0f1013 100%);
+  background: radial-gradient(circle at 70% 35%, #151a24 0%, #0c0f14 60%, #07090c 100%);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
@@ -91,17 +90,24 @@ body.night-mode .btn-back-street {
 
 /* Left Typography & Content Column */
 .hero-content-col {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 10;
   width: 100%;
-  max-width: 580px;
+  max-width: 660px;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: var(--header-height) var(--space-md) var(--space-lg);
-  pointer-events: auto;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(12, 13, 17, 0.52) 0%, rgba(12, 13, 17, 0.25) 45%, rgba(12, 13, 17, 0) 100%);
   transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.hero-content-col > * {
+  pointer-events: auto;
 }
 
 @media (min-width: 768px) {
@@ -126,6 +132,7 @@ body.night-mode .btn-back-street {
   color: #ffffff;
   margin-bottom: var(--space-xs);
   text-transform: uppercase;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
 .hero-subtitle {
@@ -136,15 +143,18 @@ body.night-mode .btn-back-street {
   text-transform: uppercase;
   color: var(--color-stone-tile);
   margin-bottom: var(--space-md);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
 }
 
 .hero-desc {
   font-family: var(--font-logo);
   font-size: 15px;
-  line-height: 1.65;
-  color: var(--color-text-day-muted);
-  max-width: 440px;
+  line-height: 1.7;
+  color: #c4c5cc;
+  max-width: 480px;
   margin-bottom: var(--space-xl);
+  font-weight: 300;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95);
 }
 
 .hero-action-bottom {
@@ -172,11 +182,11 @@ body.night-mode .btn-back-street {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Right 3D Scene Container */
+/* Fullscreen 3D Scene Container */
 .hero-3d-col {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   z-index: 5;
@@ -185,7 +195,7 @@ body.night-mode .btn-back-street {
 
 @media (min-width: 992px) {
   .hero-3d-col {
-    width: 65%;
+    width: 100%;
   }
 }
 
